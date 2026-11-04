@@ -1,0 +1,16 @@
+node_modules/
+.env
+.env.*
+!.env.example
+supabase/.temp/
+supabase/.branches/
+supabase/.env
+*.pem
+*.key
+*.dump
+*.backup
+respaldos/
+datos-reales/
+operacion/*_local.sql
+.DS_Store
+Thumbs.db
