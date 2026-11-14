@@ -1,6 +1,14 @@
+# MAPO · Edificio Marcelo
+
+Portal de huéspedes y administración de alquileres en Huancayo. La entrega completa incluye las pantallas hasta la 13, favoritos, reservas con detalle y saldo propio, perfil editable, galería del edificio y tablero administrativo. **Para actualizar tu proyecto existente y usarlo desde la laptop, comienza por [GUIA_ENTREGA.md](GUIA_ENTREGA.md).** La migración nueva es la número 7; las seis anteriores se conservan sin cambios.
+
+## Guía de la primera instalación
+
+Los pasos que siguen son para una instalación desde cero en desarrollo. Si ya tienes un proyecto instalado, usa la guía de actualización y no crees otra base. El documento Word incluido conserva la guía histórica de la primera versión; este README y GUIA_ENTREGA.md describen la entrega actual.
+
 # Base de datos de MAPO en Supabase
 
-Guía de instalación para el **Edificio Marcelo, Huancayo**. Puedes guardar todo ahora y seguir los pasos cuando termines tus pantallas. El proyecto incluye la base, un formulario de registro y un panel administrativo independiente. Tu web actual sigue funcionando como demostración.
+Guía de instalación para el **Edificio Marcelo, Huancayo**. Incluye el portal con registro y acceso integrado, solicitudes por días o meses, galería administrable y operaciones de alquiler.
 
 ## 1 Preparar la carpeta en Windows
 
@@ -20,7 +28,7 @@ El último comando debe mostrar **3.0.0**. El paquete fija esa versión de la CL
 
 | Qué abrir | Para qué sirve |
 |---|---|
-| supabase/migrations | Cinco archivos SQL en orden: modelo, operaciones, caja, permisos de acceso y ajustes. |
+| supabase/migrations | Siete archivos SQL en orden: modelo, operaciones, caja, permisos, ajustes, perfil/solicitudes y portal/galería. |
 | web/index.html y web/config.js | Registro, acceso, búsqueda y panel de administración desde un navegador. |
 | operacion | Verificar la instalación y asignar el primer administrador. |
 | pruebas y docs | Pruebas SQL reversibles, diccionario del modelo y lista de comprobaciones reales. |
@@ -57,7 +65,7 @@ npx.cmd supabase link --project-ref TU_PROJECT_REF
 npx.cmd supabase db push --remote --dry-run
 ```
 
-Comprueba que el destino sea tu proyecto de desarrollo y que la vista previa enumere los cinco archivos que aparecen en `supabase/migrations`. Si muestra cambios inesperados, comprueba la carpeta y la referencia antes de continuar. Esta ruta utiliza el proyecto alojado: **no necesitas Docker para estos comandos**.
+Comprueba que el destino sea tu proyecto de desarrollo y que la vista previa enumere los siete archivos que aparecen en `supabase/migrations`. Si muestra cambios inesperados, comprueba la carpeta y la referencia antes de continuar. Esta ruta utiliza el proyecto alojado: **no necesitas Docker para estos comandos**.
 
 **8. Aplica las migraciones una sola vez.** Con la versión 3 de la CLI, **--remote** indica que el destino es el proyecto vinculado. Sin esa opción, el destino predeterminado es local.
 
@@ -66,11 +74,11 @@ npx.cmd supabase db push --remote
 npx.cmd supabase migration list --remote
 ```
 
-Acepta la aplicación cuando la CLI muestre los archivos esperados. En la lista deben coincidir las cinco versiones locales y remotas. En adelante crea migraciones nuevas; no vuelvas a pegar estos archivos manualmente en SQL Editor en el mismo proyecto.
+Acepta la aplicación cuando la CLI muestre los archivos esperados. En la lista deben coincidir las siete versiones locales y remotas. En adelante crea migraciones nuevas; no vuelvas a pegar estos archivos manualmente en SQL Editor en el mismo proyecto.
 
 **9. Verifica el resultado.** Abre **SQL Editor → New query**. Copia el contenido completo de `operacion/02_verificar_instalacion.sql` y pulsa **Run**. Revisa que existan **Edificio Marcelo**, las fichas **gris** y **verde** sin publicar y el bucket privado **mapo-fotos**. Las 12 tablas de la aplicación deben tener seguridad por filas activa; la restricción se llama **mapo_sin_cruces**.
 
-**10. Comprueba las reglas sin dejar datos de ejemplo.** Solo en desarrollo, ejecuta **por separado y completos**, en SQL Editor, `pruebas/01_flujo_y_permisos.sql` y `pruebas/02_calendario_y_caja.sql`. Cada archivo comienza una transacción y termina en **ROLLBACK**. Si tiene éxito, no queda ningún huésped ni movimiento de prueba; un error detiene la prueba y muestra el motivo.
+**10. Comprueba las reglas sin dejar datos de ejemplo.** Solo en desarrollo, ejecuta **por separado y completos**, en SQL Editor, los cuatro archivos de `pruebas/` (01 a 04). Cada archivo comienza una transacción y termina en **ROLLBACK**. Si tiene éxito, no queda ningún huésped ni movimiento de prueba; un error detiene la prueba y muestra el motivo.
 
 <!-- page -->
 ## 4 Registrar una cuenta y dar acceso al administrador
@@ -124,7 +132,7 @@ Abre [el portal local](http://127.0.0.1:5500/web/). No abras el archivo con dobl
 ```powershell
 git init -b main
 git status
-git add .gitignore .github README.md package.json package-lock.json supabase web operacion pruebas docs
+git add .gitignore .github README.md GUIA_ENTREGA.md ACTUALIZAR.cmd package.json package-lock.json supabase web operacion pruebas docs
 git diff --cached --stat
 git commit -m "Prepara reservas y administracion de MAPO"
 git remote add origin https://github.com/TU_USUARIO/mapo-alquileres.git
@@ -142,7 +150,7 @@ Cuando Pages indique su URL, por ejemplo `https://TU_USUARIO.github.io/mapo-alqu
 <!-- page -->
 ## 7 Integrar las pantallas y mantener la base
 
-**24. Conecta tu diseño cuando esté terminado.** Conserva la imagen del Edificio Marcelo, la carga de cinco segundos y el destino fijo Huancayo. Sustituye el acceso de demostración por el registro e inicio de sesión del portal. Luego reemplaza la lista fija de departamentos, los favoritos locales y el panel de reservas en ese orden. En `docs/MODELO.md` hay una correspondencia entre las funciones de tu web y los datos reales.
+**24. Revisa el portal integrado.** El catálogo, perfil, favoritos, solicitudes y administración consultan Supabase. Se conserva la carga de cinco segundos y el destino Huancayo. En Galería del edificio publica tus fotos; en Contenido del portal revisa los textos y canales de contacto. Sigue el recorrido de pantallas de `GUIA_ENTREGA.md` y los casos de `docs/ACEPTACION.md`.
 
 **25. Haz una prueba con dos cuentas.** Sigue `docs/ACEPTACION.md`: verifica envío de correos, aislamiento de clientes, subida y visualización de fotos, dos confirmaciones para las mismas fechas, un pago parcial y una devolución. Hazlo con cuentas y cantidades de prueba. Este material no ha creado ningún proyecto ni cuenta en Supabase o GitHub.
 

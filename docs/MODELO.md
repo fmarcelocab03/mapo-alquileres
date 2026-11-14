@@ -30,10 +30,10 @@ Unidad de venta: un departamento completo en Huancayo. No se reservan dormitorio
 |---|---|---|---|
 | Catálogo publicado y disponibilidad sin nombres de huéspedes | Sí (API) | Sí | Sí, más borradores |
 | Solicitudes, perfil y favoritos | No | Solo propios | Atiende reservas; los favoritos siguen siendo personales |
-| Hacerse administrador | No | No | Tampoco por el portal; solo el propietario en SQL |
+| Gestionar administradores | No | No | Solo un administrador habilitado como gestor de roles; el propietario establece esa delegación |
 | Confirmar, bloquear, cuotas, cobros, gastos y reportes | No | No | Sí, mediante operaciones autorizadas |
 | Editar tarifas, servicios, fichas o subir fotos | No | No | Sí |
-El portal de práctica pide acceso para buscar o solicitar. La base permite también diseñar un catálogo público en la web principal. La lectura financiera se limita al administrador; un cliente ve su reserva y estado, no el libro de cobros del negocio.
+El portal de práctica pide acceso para buscar o solicitar. La base permite también diseñar un catálogo público en la web principal. El libro de caja se limita al administrador. El huésped consulta sus cuotas y saldos mediante `mi_reserva_detalle`, que comprueba la titularidad de la reserva; no accede a las tablas financieras ni al libro de cobros del negocio.
 
 ## Indicadores
 - Noches de inventario: suma de días entre alta y baja de los departamentos, recortados al mes. Sin alta no entra al denominador.
@@ -57,3 +57,20 @@ El portal de práctica pide acceso para buscar o solicitar. La base permite tamb
 
 ## Límites y siguientes etapas
 El portal registra pagos que MAPO ya verificó por otro medio: no cobra tarjetas, no emite comprobantes tributarios ni importa automáticamente Airbnb. No guardes números de tarjeta, claves bancarias, documentos de identidad o contratos en el bucket de fotos. Si incorporas contratos o comprobantes, crea un bucket privado distinto con acceso por titular y personal autorizado. Antes de operar con huéspedes reales, define permisos de empleados, política de conservación de datos, autenticación reforzada para administradores, copias y restauración. Para un historial largo, añade paginación de interfaz y reportes por edificio; el piloto consolida MAPO.
+
+
+## Ampliaciones de las migraciones 6 y 7
+
+| Elemento | Responsabilidad y permisos |
+| --- | --- |
+| Perfil del cliente | Nombre, celular, DNI opcional como texto y ciudad; edición limitada al titular. Auth gestiona el correo y sus confirmaciones. |
+| `mapo-avatares` | Bucket privado para la imagen del perfil; cada cuenta opera sobre su propia ruta. |
+| Gestores de roles | Un administrador explícitamente habilitado puede conceder o revocar acceso administrativo. El alta pública no concede privilegios. |
+| `portal_config` | Una sola fila con los textos, contactos y condiciones. Lectura pública; actualización de columnas autorizadas solo para administradores. |
+| `galeria_lugar` | Título, descripción, categoría, orden, publicación y ruta inmutable de cada fotografía del edificio. Huéspedes y visitantes solo leen las publicadas. |
+| `mapo-lugar` | Bucket privado; las políticas de lectura vinculan cada objeto con una fila visible de `galeria_lugar`. Solo el administrador crea o elimina archivos. |
+| `mi_reserva_detalle(uuid)` | Verifica `auth.uid()` y devuelve la reserva propia con nombre del departamento, cuotas y saldos, incluso si luego se despublicó el departamento. No devuelve movimientos ni información de otros clientes. |
+
+La galería usa nombres de archivo UUID inmutables. Las URLs firmadas duran diez minutos; ocultar una foto impide emitir nuevas URLs, pero no revoca de inmediato una ya entregada. El cliente vuelve a consultar el contenido al vencer su caché de un minuto o al recargar. El formulario de edición compara `actualizado_en` para detectar modificaciones concurrentes.
+
+La galería del lugar, las fotos de cada departamento y los avatares son conjuntos separados. Nunca se incorpora una fotografía al edificio únicamente por estar en un departamento. Las migraciones no publican imágenes de referencia como si fueran fotos reales.

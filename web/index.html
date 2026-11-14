@@ -1,22 +1,649 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>MAPO · Portal de pruebas</title><link rel="stylesheet" href="estilos.css"><script defer src="./vendor/supabase.js"></script><script defer src="./config.js"></script><script defer src="./portal.js"></script></head>
-<body><header><div><b>MAPO</b><span> Edificio Marcelo · Huancayo</span></div><button id="salir" hidden>Cerrar sesión</button></header>
-<main><p class="tag">ALQUILERES POR DÍAS Y POR MES</p><h1 id="titulo">Tu cuenta en MAPO</h1><p id="estado" role="status" aria-live="polite">Preparando el acceso…</p>
-<section id="auth"><h2>Ingresar o crear una cuenta</h2><form id="acceso"><label>Nombre para el registro<input name="nombre" autocomplete="name" maxlength="150"></label><label>Correo<input name="correo" type="email" autocomplete="email" required></label><label>Contraseña<input type="password" name="clave" autocomplete="current-password"></label><div class="acciones"><button value="ingresar">Iniciar sesión</button><button value="registrar" class="sec">Crear cuenta</button><button value="recuperar" class="sec">Recuperar acceso</button></div></form></section>
-<section id="recuperar" hidden><h2>Cambiar contraseña</h2><form id="nuevaClave"><label>Nueva contraseña<input type="password" name="clave" minlength="10" autocomplete="new-password" required></label><button>Guardar nueva contraseña</button></form></section>
-<section id="cliente" hidden><h2>Buscar una estancia</h2><p>El destino es Huancayo. Una solicitud no bloquea las fechas hasta que MAPO la confirma.</p>
-<form id="buscar"><label>Modalidad<select name="modo"><option value="dias">Por días</option><option value="mensual">Mensual</option></select></label><label>Entrada<input name="entrada" type="date" required></label><label id="lbSalida">Salida<input name="salida" type="date" required></label><label id="lbMeses" hidden>Duración<select name="meses"><option>1</option><option>3</option><option>6</option><option>12</option></select></label><label>Huéspedes<input name="personas" type="number" min="1" max="100" value="1" required></label><button>Buscar disponibles</button></form>
-<div id="resultados"></div><details><summary>Mis solicitudes y reservas</summary><div id="mias"></div></details><details><summary>Mis favoritos</summary><div id="misFav"></div></details></section>
-<section id="admin" hidden><p class="tag">ADMINISTRACIÓN</p><h2>Panel de MAPO</h2>
-<details open><summary>Ocupación y caja por mes</summary><form id="informe"><label>Fecha del calendario<input name="dia" type="date" required></label><label>Año del informe<input name="anio" type="number" min="2000" max="2200" required></label><button>Actualizar panel</button></form><h3>Departamentos en la fecha elegida</h3><div id="ocupacion"></div><h3>Resultados mensuales en soles</h3><p>Ocupación según noches vendidas; caja = cobros − devoluciones − gastos. Garantías aparte. El pendiente es el saldo actual agrupado por mes de vencimiento.</p><div id="ranking"></div><div id="meses"></div></details>
-<details><summary>Departamentos, tarifas y servicios</summary><form id="ficha"><label>Ficha<select name="id" id="editarDep"></select></label><label>Edificio<select name="edificio" data-lista="edificios" required></select></label><label>Código único<input name="codigo" pattern="[a-z0-9][a-z0-9\-]{0,59}" placeholder="gris" required></label><label>Nombre<input name="nombre" maxlength="160" required></label><label>Capacidad<input name="capacidad" type="number" min="1" max="100"></label><label>Dormitorios<input name="dormitorios" type="number" min="0"></label><label>Por noche (S/)<input name="dia" type="number" min=".01" step=".01"></label><label>Por mes (S/)<input name="mes" type="number" min=".01" step=".01"></label><label>Alta en inventario<input name="alta" type="date"></label><label>Baja (primer día fuera)<input name="baja" type="date"></label><label class="ancho">Descripción<textarea name="descripcion" maxlength="3500"></textarea></label><label><span>Visible en catálogo</span><input name="publicado" type="checkbox"></label><button>Guardar ficha</button></form>
-<form id="nuevoServicio"><label>Nuevo servicio<input name="nombre" required></label><button>Crear servicio</button></form><form id="asignarServicio"><label>Departamento<select name="dep" data-lista="departamentos" required></select></label><label>Servicio<select name="serv" data-lista="servicios" required></select></label><button value="poner">Asignar servicio</button><button value="quitar" class="sec">Quitar servicio</button></form></details>
-<details><summary>Fotos de los departamentos</summary><p>JPG, PNG o WebP, hasta 5 MiB. La primera por orden será la portada.</p><form id="subir"><label>Departamento<select name="dep" data-lista="departamentos" required></select></label><label>Imagen<input type="file" name="foto" accept="image/jpeg,image/png,image/webp" required></label><label>Descripción de la foto<input name="alt" required></label><label>Orden<input type="number" name="orden" min="0" value="0" required></label><button>Subir foto</button></form><div id="fotosLista"></div></details>
-<details><summary>Solicitudes, ingresos y salidas</summary><p>La salida es el primer día libre. Dos estancias pueden coincidir en el día de salida y entrada.</p><div id="reservasLista"></div></details>
-<details><summary>Reservas externas y bloqueos</summary><form id="externo"><label>Nombre de cliente externo<input name="nombre" required></label><label>Correo<input type="email" name="correo"></label><label>Teléfono<input name="tel"></label><button>Crear cliente externo</button></form>
-<form id="resExterna"><label>Cliente<select name="cli" data-lista="clientes" required></select></label><label>Departamento<select name="dep" data-lista="departamentos" required></select></label><label>Modalidad<select name="modo"><option value="dias">Por días</option><option value="mensual">Mensual</option></select></label><label>Entrada<input name="ini" type="date" required></label><label>Salida (por días)<input name="fin" type="date"></label><label>Meses (mensual)<input name="meses" type="number" min="1" max="60"></label><label>Huéspedes<input name="hues" type="number" min="1" value="1" required></label><label>Canal<select name="canal"><option>airbnb</option><option>whatsapp</option><option>directo</option><option>facebook</option><option>marketplace</option><option>otro</option></select></label><label>Referencia del canal<input name="ref"></label><label>Tarifa acordada por noche o mes (opcional)<input type="number" name="precio" min=".01" step=".01"></label><button>Registrar y confirmar</button></form>
-<form id="bloqueo"><label>Departamento<select name="dep" data-lista="departamentos" required></select></label><label>Desde<input name="ini" type="date" required></label><label>Hasta (exclusivo)<input name="fin" type="date" required></label><label>Tipo<select name="tipo"><option>mantenimiento</option><option>uso_propietario</option></select></label><label>Motivo<input name="motivo" required></label><button>Bloquear fechas</button></form></details>
-<details><summary>Cuotas, cobros y devoluciones</summary><div id="cuotasLista"></div><h3>Pagos y devoluciones registrados</h3><div id="movLista"></div><form id="pago"><label>Cuota<select name="cuota" data-lista="cuotas" required></select></label><label>Movimiento<select name="tipo"><option>cobro</option><option>devolucion</option></select></label><label>Importe (S/)<input name="importe" type="number" min=".01" step=".01" required></label><label>Fecha efectiva<input name="fecha" type="date" required></label><label>Medio<select name="medio"><option>yape</option><option>plin</option><option>efectivo</option><option>transferencia</option><option>tarjeta</option><option>airbnb</option><option>otro</option></select></label><label>Referencia<input name="ref"></label><button>Registrar movimiento</button></form>
-<form id="cargo"><label>Reserva<select name="res" data-lista="reservas" required></select></label><label>Concepto<select name="concepto"><option>adicional</option><option>penalidad</option></select></label><label>Detalle<input name="detalle" required></label><label>Vencimiento<input type="date" name="vence" required></label><label>Importe<input type="number" min=".01" step=".01" name="importe" required></label><button>Agregar cargo</button></form></details>
-<details><summary>Gastos y garantías</summary><form id="gasto"><label>Departamento<select name="dep" data-lista="depOpcional"></select></label><label>Fecha del gasto<input name="fecha" type="date" required></label><label>Categoría<select name="categoria"><option>limpieza</option><option>mantenimiento</option><option>servicios</option><option>comision</option><option>otros</option></select></label><label>Detalle<input name="detalle" required></label><label>Importe (S/)<input name="importe" type="number" min=".01" step=".01" required></label><button>Registrar gasto</button></form>
-<div id="gastosLista"></div><form id="garantia"><label>Reserva<select name="res" data-lista="reservas" required></select></label><label>Tipo<select name="tipo"><option>recibida</option><option>devuelta</option></select></label><label>Fecha<input name="fecha" type="date" required></label><label>Importe (S/)<input name="importe" type="number" min=".01" step=".01" required></label><label>Referencia<input name="ref"></label><button>Guardar garantía</button></form><div id="garantiasLista"></div></details>
-</section></main><footer>MAPO · Portal de integración para usar cuando actives Supabase.</footer></body></html>
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#00a5cf" />
+    <meta
+      name="description"
+      content="MAPO Inmobiliaria. Departamentos amoblados para alquileres por días y mensuales en Huancayo. Edificio Marcelo, Huancayo."
+    />
+    <title>MAPO · Bienvenido</title>
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="estancia.css" />
+    <link rel="stylesheet" href="experiencia.css" />
+    <script defer src="vendor/supabase.js"></script>
+    <script defer src="config.js"></script>
+    <script defer src="conexion.js"></script>
+    <script defer src="contenido.js"></script>
+    <script defer src="script.js"></script>
+    <script defer src="estancia.js"></script>
+    <script defer src="experiencia.js"></script>
+  </head>
+  <body class="view-splash">
+    <!-- Iconos vectoriales locales. No se necesitan bibliotecas ni conexión a Internet. -->
+    <svg
+      class="svg-library"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <symbol id="i-camera" viewBox="0 0 24 24">
+        <path d="M3 7h4l2-3h6l2 3h4v13H3Z" />
+        <circle cx="12" cy="13" r="3.5" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M4 12h15m-6-6 6 6-6 6" />
+      </symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="3" />
+        <path d="m4 7 8 6 8-6" />
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24">
+        <rect x="5" y="10" width="14" height="11" rx="3" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3" />
+      </symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="3" />
+      </symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24">
+        <path
+          d="m3 3 18 18M10 5a12 12 0 0 1 2 0c7 0 10 7 10 7a17 17 0 0 1-3 4M6 6a17 17 0 0 0-4 6s3 7 10 7a11 11 0 0 0 5-1M10 10a3 3 0 0 0 4 4"
+        />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="3" />
+        <path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2" />
+      </symbol>
+      <symbol id="i-building" viewBox="0 0 24 24">
+        <rect x="5" y="2" width="14" height="20" rx="2" />
+        <path d="M9 6h1m4 0h1M9 10h1m4 0h1M9 14h1m4 0h1m-5 8v-4h4v4" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="7" />
+        <path d="m16 16 5 5" />
+      </symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M18 6 6 18" />
+      </symbol>
+      <symbol id="i-home" viewBox="0 0 24 24">
+        <path d="m2 11 10-8 10 8M5 9v12h5v-7h4v7h5V9" />
+      </symbol>
+      <symbol id="i-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="7" r="4" />
+        <path d="M4 22v-3a8 8 0 0 1 16 0v3" />
+      </symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24">
+        <path
+          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"
+        />
+      </symbol>
+      <symbol id="i-bed" viewBox="0 0 24 24">
+        <path d="M3 4v16m18-7v7M3 16h18M3 9h15a3 3 0 0 1 3 3v4M3 12h6V8H3" />
+      </symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24">
+        <path
+          d="M2 8a16 16 0 0 1 20 0M5 12a11 11 0 0 1 14 0M8 16a6 6 0 0 1 8 0m-4 4h.01"
+        />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="i-help" viewBox="0 0 24 24">
+        <path
+          d="M4 14v-3a8 8 0 0 1 16 0v3M5 19H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1Zm14 0h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1Zm0 0c0 3-4 3-7 3"
+        />
+      </symbol>
+      <symbol id="i-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v6m0-10h.01" />
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24">
+        <path d="M14 2H5v20h14V7Zm0 0v5h5M8 11h8m-8 4h8m-8 4h5" />
+      </symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24">
+        <path d="M9 3H4v18h5m-1-9h13m-5-5 5 5-5 5" />
+      </symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24">
+        <path d="m5 3 4 4-2 3a15 15 0 0 0 7 7l3-2 4 4-2 3C10 22 2 14 2 5Z" />
+      </symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24">
+        <path d="M9 5v14m6-14v14" />
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24">
+        <path d="m8 5 11 7-11 7Z" />
+      </symbol>
+    </svg>
+
+    <!-- PANTALLA 1: la transición de cinco segundos se controla en script.js. -->
+    <section
+      id="screen-splash"
+      class="screen splash architectural-bg"
+      aria-labelledby="splash-title"
+    >
+      <div class="splash-content">
+        <svg
+          class="brand brand-large"
+          role="img"
+          aria-label="MAPO Inmobiliaria"
+          viewBox="270 120 990 850"
+        >
+          <image href="assets/logo-mapo.png" width="1536" height="1024" />
+        </svg>
+        <h1 id="splash-title">
+          Más que un espacio,<br /><span>un lugar para sentirte en casa.</span>
+        </h1>
+        <div
+          class="loading-track"
+          role="progressbar"
+          aria-label="Cargando MAPO"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+        >
+          <div class="loading-fill"></div>
+        </div>
+        <p class="loading-label" role="status">
+          Preparando tu próximo espacio…
+        </p>
+      </div>
+      <div class="splash-footer">
+        <p class="splash-location">
+          <svg class="icon"><use href="#i-pin" /></svg> Huancayo, Perú
+        </p>
+        <button
+          class="motion-toggle"
+          type="button"
+          data-motion-toggle
+          aria-label="Pausar animación del fondo"
+        >
+          <svg class="icon" aria-hidden="true"><use href="#i-pause" /></svg
+          ><span>Pausar fondo</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Acceso mediante Supabase Auth. -->
+    <section
+      id="screen-login"
+      class="screen login-screen"
+      hidden
+      aria-labelledby="login-title"
+    >
+      <aside
+        class="login-story"
+        aria-label="Edificio MAPO con vista a Huancayo"
+      >
+        <img
+          class="building-art"
+          src="assets/edificio-mapo-hd.png"
+          width="1586"
+          height="992"
+          alt="Ilustración referencial de un edificio con vista a Huancayo"
+          fetchpriority="high"
+        />
+        <div class="story-shade" aria-hidden="true"></div>
+        <div class="story-content">
+          <span class="eyebrow light">TU ESTANCIA EN HUANCAYO</span>
+          <h2>Más que un espacio,<br />un lugar para<br />sentirte en casa.</h2>
+          <p>
+            Departamentos amoblados.<br />Por unos días o por una nueva etapa.
+          </p>
+          <span class="story-location"
+            ><svg class="icon" aria-hidden="true"><use href="#i-pin" /></svg>
+            Huancayo, Perú</span
+          >
+        </div>
+      </aside>
+      <div class="login-panel architectural-bg">
+        <div class="login-content">
+          <svg
+            class="brand brand-login"
+            role="img"
+            aria-label="MAPO Inmobiliaria"
+            viewBox="270 120 990 850"
+          >
+            <image href="assets/logo-mapo.png" width="1536" height="1024" />
+          </svg>
+          <h1 id="login-title" tabindex="-1">Bienvenido a <span>MAPO</span></h1>
+          <p class="intro">Tu próximo espacio comienza aquí.</p>
+          <form id="login-form" novalidate>
+            <div class="form-field">
+              <label for="email">Correo electrónico</label>
+              <div class="input-shell">
+                <svg class="icon"><use href="#i-mail" /></svg
+                ><input
+                  id="email"
+                  name="email"
+                  type="email"
+                  autocomplete="username"
+                  placeholder="Ingresa tu correo"
+                  required
+                  aria-describedby="email-error"
+                />
+              </div>
+              <p class="field-error" id="email-error" hidden></p>
+            </div>
+            <div class="form-field">
+              <label for="password">Contraseña</label>
+              <div class="input-shell">
+                <svg class="icon"><use href="#i-lock" /></svg
+                ><input
+                  id="password"
+                  name="password"
+                  type="password"
+                  autocomplete="current-password"
+                  placeholder="Ingresa tu contraseña"
+                  required
+                  aria-describedby="password-error"
+                /><button
+                  class="icon-button password-toggle"
+                  type="button"
+                  id="password-toggle"
+                  aria-label="Mostrar contraseña"
+                  aria-pressed="false"
+                >
+                  <svg class="icon"><use href="#i-eye" /></svg>
+                </button>
+              </div>
+              <p class="field-error" id="password-error" hidden></p>
+            </div>
+            <div class="login-options">
+              <label class="checkbox-label"
+                ><input type="checkbox" id="remember" name="remember" /><span
+                  >Recordarme</span
+                ></label
+              ><button class="text-button" type="button" data-dialog="recovery">
+                ¿Olvidé mi contraseña?
+              </button>
+            </div>
+            <p id="login-error" class="form-error" role="alert" hidden></p>
+            <button
+              class="button primary login-submit"
+              id="login-submit"
+              type="submit"
+            >
+              <span>Iniciar sesión</span
+              ><svg class="icon"><use href="#i-arrow" /></svg>
+            </button>
+          </form>
+          <p class="signup-line">
+            ¿No tienes cuenta?
+            <button
+              class="text-button"
+              data-dialog="registration"
+              type="button"
+            >
+              Regístrate
+            </button>
+          </p>
+
+          <p class="login-note">
+            Recordarme conserva tu correo en este dispositivo.
+          </p>
+        </div>
+        <div class="login-footer">
+          <p class="login-location">
+            <svg class="icon"><use href="#i-pin" /></svg> Huancayo, Perú
+          </p>
+          <button
+            class="motion-toggle"
+            type="button"
+            data-motion-toggle
+            aria-label="Pausar animación del fondo"
+          >
+            <svg class="icon" aria-hidden="true"><use href="#i-pause" /></svg
+            ><span>Pausar fondo</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PANTALLA 3: inicio, búsqueda y navegación. El resto se muestra en paneles auxiliares. -->
+    <section
+      id="screen-home"
+      class="screen home-screen"
+      hidden
+      aria-labelledby="home-title"
+    >
+      <header class="main-header">
+        <div class="header-inner">
+          <button
+            type="button"
+            class="brand-link"
+            data-action="home"
+            aria-label="MAPO, ir al inicio"
+          >
+            <svg
+              class="brand brand-header"
+              aria-hidden="true"
+              viewBox="270 120 990 850"
+            >
+              <image href="assets/logo-mapo.png" width="1536" height="1024" />
+            </svg></button
+          ><span class="header-location"
+            ><svg class="icon"><use href="#i-pin" /></svg> Huancayo, Perú</span
+          ><button
+            type="button"
+            class="menu-toggle icon-button"
+            id="menu-toggle"
+            aria-label="Abrir menú"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+          >
+            <svg class="icon"><use href="#i-menu" /></svg>
+          </button>
+        </div>
+      </header>
+      <main id="home-content">
+        <section class="hero">
+          <div class="hero-copy">
+            <span class="eyebrow">BIENVENIDO A MAPO</span>
+            <h1 id="home-title" tabindex="-1">
+              Más que un espacio,<br /><span
+                >un lugar para<br />sentirte en casa.</span
+              >
+            </h1>
+            <p>
+              Encuentra tu estancia en Huancayo.<br />Por días o por todo el
+              mes.
+            </p>
+          </div>
+          <div class="hero-image">
+            <span class="reference-tag">Imagen referencial</span
+            ><img
+              class="building-art"
+              src="assets/edificio-mapo-hd.png"
+              width="1586"
+              height="992"
+              alt="Ilustración referencial del edificio en Huancayo"
+              decoding="async"
+            />
+          </div>
+        </section>
+        <div class="home-container">
+          <form id="search-form" class="search-panel" novalidate>
+            <div class="segmented" aria-label="Modalidad de alquiler">
+              <button
+                type="button"
+                class="segment active"
+                data-mode="days"
+                aria-pressed="true"
+              >
+                <svg class="icon"><use href="#i-calendar" /></svg> Por días</button
+              ><button
+                type="button"
+                class="segment"
+                data-mode="monthly"
+                aria-pressed="false"
+              >
+                <svg class="icon"><use href="#i-building" /></svg> Mensual
+              </button>
+            </div>
+            <div class="search-fields">
+              <div class="search-field location-field">
+                <label for="destination">¿Dónde quieres quedarte?</label>
+                <div class="search-control">
+                  <svg class="icon"><use href="#i-pin" /></svg
+                  ><input
+                    type="text"
+                    id="destination"
+                    name="destination"
+                    value="Huancayo"
+                    readonly
+                    aria-readonly="true"
+                    autocomplete="off"
+                  />
+                </div>
+              </div>
+              <div class="search-field">
+                <label for="arrival" id="arrival-label">Entrada</label>
+                <div class="search-control">
+                  <input
+                    type="date"
+                    id="arrival"
+                    name="arrival"
+                    aria-describedby="search-error"
+                  />
+                </div>
+              </div>
+              <div class="search-field" id="departure-field">
+                <label for="departure">Salida</label>
+                <div class="search-control">
+                  <input
+                    type="date"
+                    id="departure"
+                    name="departure"
+                    aria-describedby="search-error"
+                  />
+                </div>
+              </div>
+              <div class="search-field" id="months-field" hidden>
+                <label for="months">Duración</label>
+                <div class="search-control">
+                  <select id="months" name="months">
+                    <option value="1">1 mes</option>
+                    <option value="3">3 meses</option>
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                  </select>
+                </div>
+              </div>
+              <button type="submit" class="button primary search-button">
+                <svg class="icon"><use href="#i-search" /></svg
+                ><span>Buscar</span>
+              </button>
+            </div>
+            <p id="search-error" class="field-error" role="alert" hidden></p>
+          </form>
+          <section
+            class="properties-section"
+            id="departamentos"
+            aria-labelledby="properties-title"
+          >
+            <div class="section-heading">
+              <div>
+                <span class="eyebrow">ENCUENTRA TU ESTANCIA</span>
+                <h2 id="properties-title" tabindex="-1">Departamentos</h2>
+              </div>
+              <button class="text-button" type="button" id="reset-search">
+                Ver todos <span aria-hidden="true">›</span>
+              </button>
+            </div>
+            <p id="search-summary" class="search-summary" role="status">
+              Espacios amoblados para disfrutar Huancayo.
+            </p>
+            <div class="property-grid" id="property-grid"></div>
+          </section>
+          <section
+            id="home-lugar"
+            class="place-section"
+            aria-label="Conoce el Edificio Marcelo"
+          ></section>
+          <div class="home-shortcuts">
+            <button data-dialog="about">Sobre MAPO <span>›</span></button
+            ><button data-dialog="terms">
+              Antes de tu estancia <span>›</span></button
+            ><button data-dialog="favorites">
+              Tus favoritos <span>♡</span>
+            </button>
+          </div>
+          <aside class="help-strip">
+            <div class="help-icon">
+              <svg class="icon"><use href="#i-help" /></svg>
+            </div>
+            <div>
+              <h2>¿Necesitas ayuda para elegir?</h2>
+              <p>Conversemos sobre tu próxima estancia.</p>
+            </div>
+            <button
+              type="button"
+              class="button secondary"
+              data-dialog="contact"
+            >
+              Contactar <svg class="icon"><use href="#i-arrow" /></svg>
+            </button>
+          </aside>
+          <p class="availability-note">
+            <svg class="icon"><use href="#i-info" /></svg> Disponibilidad y
+            tarifas sujetas a confirmación con MAPO.
+          </p>
+          <footer class="home-footer">
+            <span>MAPO INMOBILIARIA</span
+            ><span>Tu próximo espacio en Huancayo.</span>
+          </footer>
+        </div>
+      </main>
+      <nav class="bottom-nav" aria-label="Navegación principal">
+        <div class="bottom-nav-inner">
+          <button
+            type="button"
+            class="nav-item active"
+            data-action="home"
+            aria-current="page"
+          >
+            <svg class="icon"><use href="#i-home" /></svg
+            ><span>Inicio</span></button
+          ><button type="button" class="nav-item" data-dialog="reservations">
+            <svg class="icon"><use href="#i-calendar" /></svg
+            ><span>Mis reservas</span></button
+          ><button type="button" class="nav-item" data-dialog="profile">
+            <svg class="icon"><use href="#i-user" /></svg><span>Perfil</span>
+          </button>
+        </div>
+      </nav>
+    </section>
+
+    <section
+      class="screen stay-screen"
+      id="screen-extra"
+      hidden
+      aria-label="Mi estancia"
+    >
+      <header class="stay-head">
+        <div>
+          <button
+            type="button"
+            class="icon-button"
+            data-back
+            aria-label="Volver"
+          >
+            <svg class="icon"><use href="#i-arrow" /></svg></button
+          ><button
+            class="mini-brand"
+            data-action="home"
+            aria-label="MAPO, ir al inicio"
+          >
+            <svg
+              class="brand brand-header"
+              aria-hidden="true"
+              viewBox="270 120 990 850"
+            >
+              <image href="assets/logo-mapo.png" width="1536" height="1024" />
+            </svg>
+          </button>
+          <div id="stay-top-action"></div>
+        </div>
+      </header>
+      <main id="stay-main"></main>
+      <nav class="bottom-nav" aria-label="Navegación de la estancia">
+        <div class="bottom-nav-inner">
+          <button type="button" class="nav-item" data-action="home">
+            <svg class="icon"><use href="#i-home" /></svg>Inicio</button
+          ><button type="button" class="nav-item" data-dialog="reservations">
+            <svg class="icon"><use href="#i-calendar" /></svg>Mis reservas</button
+          ><button type="button" class="nav-item" data-dialog="profile">
+            <svg class="icon"><use href="#i-user" /></svg>Perfil
+          </button>
+        </div>
+      </nav>
+    </section>
+    <dialog id="menu-dialog" class="menu-dialog" aria-labelledby="menu-title">
+      <div class="menu-top">
+        <span id="menu-title">Explora MAPO</span
+        ><button
+          type="button"
+          class="icon-button"
+          data-close="menu-dialog"
+          aria-label="Cerrar menú"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <p class="menu-subtitle">Tu próximo espacio, a un paso.</p>
+      <nav class="menu-items" aria-label="Menú de MAPO">
+        <button type="button" data-action="explore">
+          <svg class="icon"><use href="#i-building" /></svg>Explorar
+          departamentos<svg class="icon end-icon">
+            <use href="#i-arrow" />
+          </svg></button
+        ><button type="button" data-dialog="favorites">
+          <svg class="icon"><use href="#i-heart" /></svg>Mis favoritos<span
+            class="menu-count"
+            id="favorites-count"
+            >0</span
+          ></button
+        ><button type="button" data-dialog="contact">
+          <svg class="icon"><use href="#i-help" /></svg>Ayuda y contacto</button
+        ><button type="button" data-dialog="about">
+          <svg class="icon"><use href="#i-info" /></svg>Sobre MAPO</button
+        ><button type="button" data-dialog="terms">
+          <svg class="icon"><use href="#i-file" /></svg>Condiciones del alquiler</button
+        ><button type="button" class="logout-menu" data-action="logout">
+          <svg class="icon"><use href="#i-logout" /></svg>Cerrar sesión
+        </button>
+      </nav>
+      <div class="menu-motion">
+        <button
+          class="motion-toggle"
+          type="button"
+          data-motion-toggle
+          aria-label="Pausar animación del fondo"
+        >
+          <svg class="icon" aria-hidden="true"><use href="#i-pause" /></svg
+          ><span>Pausar fondo</span>
+        </button>
+      </div>
+      <p class="menu-bottom">
+        <svg class="icon"><use href="#i-pin" /></svg> Huancayo, Perú
+      </p>
+    </dialog>
+    <dialog
+      id="content-dialog"
+      class="content-dialog"
+      aria-labelledby="dialog-title"
+    >
+      <div class="dialog-header">
+        <h2 id="dialog-title"></h2>
+        <button
+          type="button"
+          class="icon-button"
+          data-close="content-dialog"
+          aria-label="Cerrar ventana"
+        >
+          <svg class="icon"><use href="#i-close" /></svg>
+        </button>
+      </div>
+      <div id="dialog-body"></div>
+    </dialog>
+    <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+    <div id="connection-banner" role="status" hidden>
+      Estás sin conexión. Vuelve a conectarte para guardar cambios.
+    </div>
+    <noscript
+      ><div class="noscript-notice">
+        Activa JavaScript para recorrer las pantallas de MAPO.
+      </div></noscript
+    >
+  </body>
+</html>

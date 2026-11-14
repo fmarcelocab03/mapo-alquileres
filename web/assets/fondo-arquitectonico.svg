@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="1400" viewBox="0 0 1000 1400" preserveAspectRatio="none" fill="none">
+  <defs>
+    <linearGradient id="glass" x1="-50" y1="920" x2="430" y2="1400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00a5cf" stop-opacity=".04"/>
+      <stop offset=".55" stop-color="#00a5cf" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#007f9f" stop-opacity=".08"/>
+    </linearGradient>
+    <linearGradient id="sky" x1="720" y1="0" x2="1090" y2="660" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00a5cf" stop-opacity=".30"/>
+      <stop offset="1" stop-color="#00a5cf" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="60" y1="810" x2="580" y2="1400" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00a5cf" stop-opacity="0"/>
+      <stop offset=".45" stop-color="#007f9f" stop-opacity=".30"/>
+      <stop offset="1" stop-color="#00a5cf" stop-opacity=".04"/>
+    </linearGradient>
+    <linearGradient id="arc" x1="600" y1="0" x2="1000" y2="750" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#007f9f" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#00a5cf" stop-opacity=".02"/>
+    </linearGradient>
+  </defs>
+  <!-- Volúmenes transparentes inspirados en fachadas y planos arquitectónicos. -->
+  <path d="M695-140H1110V800C1030 627 990 496 900 361 795 205 713 107 695-140Z" fill="url(#sky)"/>
+  <path d="M754-170C708 90 868 216 962 374 1056 532 1083 639 1090 805" stroke="url(#arc)" stroke-width="2"/>
+  <path d="M697-170C651 90 811 216 905 374 999 532 1026 639 1033 805" stroke="url(#arc)"/>
+  <path d="M640-170C594 90 754 216 848 374 942 532 969 639 976 805" stroke="url(#arc)"/>
+  <path d="M583-170C537 90 697 216 791 374 885 532 912 639 919 805" stroke="url(#arc)"/>
+  <path d="M-240 1065 78 834 510 1234 192 1465Z" fill="url(#glass)"/>
+  <path d="M-157 1127 161 896 593 1296 275 1527Z" fill="#00a5cf" fill-opacity=".045" stroke="url(#edge)"/>
+  <path d="M-75 1190 243 959 675 1359 357 1590Z" stroke="url(#edge)"/>
+  <g stroke="#007f9f" stroke-opacity=".16" stroke-width="1">
+    <path d="M-155 1003 277 1403M-83 951 349 1351M-11 899 421 1299"/>
+    <path d="M-178 1122 140 891M-116 1179 202 948M-54 1236 264 1005M8 1293 326 1062M70 1350 388 1119M132 1407 450 1176"/>
+  </g>
+  <path d="M-240 1065 78 834 510 1234" stroke="url(#edge)" stroke-width="2"/>
+  <path d="M1130 1108 859 1306 1025 1458" stroke="#00a5cf" stroke-opacity=".18"/>
+  <path d="M1192 1139 921 1337 1087 1489" stroke="#00a5cf" stroke-opacity=".10"/>
+  <g stroke="#007f9f" stroke-opacity=".30">
+    <path d="M80 225h16m-8-8v16M834 1058h16m-8-8v16"/>
+    <circle cx="875" cy="204" r="4"/>
+    <circle cx="160" cy="1188" r="4"/>
+  </g>
+</svg>

@@ -1,0 +1,927 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MAPO · Administración</title>
+    <link rel="stylesheet" href="estilos.css" />
+    <script defer src="./vendor/supabase.js"></script>
+    <script defer src="./config.js"></script>
+    <script defer src="conexion.js"></script>
+    <script defer src="contenido.js"></script>
+    <script defer src="dialogos-admin.js"></script>
+    <script defer src="./portal.js"></script>
+    <link rel="stylesheet" href="panel.css" />
+    <script defer src="panel.js"></script>
+    <link rel="stylesheet" href="contenido-admin.css" />
+    <script defer src="contenido-admin.js"></script>
+  </head>
+  <body>
+    <svg
+      class="svg-library"
+      xmlns="http://www.w3.org/2000/svg"
+      aria-hidden="true"
+    >
+      <symbol id="i-camera" viewBox="0 0 24 24">
+        <path d="M3 7h4l2-3h6l2 3h4v13H3Z" />
+        <circle cx="12" cy="13" r="3.5" />
+      </symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24">
+        <path d="M4 12h15m-6-6 6 6-6 6" />
+      </symbol>
+      <symbol id="i-mail" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="14" rx="3" />
+        <path d="m4 7 8 6 8-6" />
+      </symbol>
+      <symbol id="i-lock" viewBox="0 0 24 24">
+        <rect x="5" y="10" width="14" height="11" rx="3" />
+        <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 4v3" />
+      </symbol>
+      <symbol id="i-eye" viewBox="0 0 24 24">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="3" />
+      </symbol>
+      <symbol id="i-eye-off" viewBox="0 0 24 24">
+        <path
+          d="m3 3 18 18M10 5a12 12 0 0 1 2 0c7 0 10 7 10 7a17 17 0 0 1-3 4M6 6a17 17 0 0 0-4 6s3 7 10 7a11 11 0 0 0 5-1M10 10a3 3 0 0 0 4 4"
+        />
+      </symbol>
+      <symbol id="i-pin" viewBox="0 0 24 24">
+        <path d="M20 10c0 6-8 12-8 12S4 16 4 10a8 8 0 0 1 16 0Z" />
+        <circle cx="12" cy="10" r="2.5" />
+      </symbol>
+      <symbol id="i-calendar" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="3" />
+        <path d="M7 3v4m10-4v4M3 11h18m-13 4h2m4 0h2" />
+      </symbol>
+      <symbol id="i-building" viewBox="0 0 24 24">
+        <rect x="5" y="2" width="14" height="20" rx="2" />
+        <path d="M9 6h1m4 0h1M9 10h1m4 0h1M9 14h1m4 0h1m-5 8v-4h4v4" />
+      </symbol>
+      <symbol id="i-search" viewBox="0 0 24 24">
+        <circle cx="10.5" cy="10.5" r="7" />
+        <path d="m16 16 5 5" />
+      </symbol>
+      <symbol id="i-menu" viewBox="0 0 24 24">
+        <path d="M4 6h16M4 12h16M4 18h16" />
+      </symbol>
+      <symbol id="i-close" viewBox="0 0 24 24">
+        <path d="m6 6 12 12M18 6 6 18" />
+      </symbol>
+      <symbol id="i-home" viewBox="0 0 24 24">
+        <path d="m2 11 10-8 10 8M5 9v12h5v-7h4v7h5V9" />
+      </symbol>
+      <symbol id="i-user" viewBox="0 0 24 24">
+        <circle cx="12" cy="7" r="4" />
+        <path d="M4 22v-3a8 8 0 0 1 16 0v3" />
+      </symbol>
+      <symbol id="i-heart" viewBox="0 0 24 24">
+        <path
+          d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z"
+        />
+      </symbol>
+      <symbol id="i-bed" viewBox="0 0 24 24">
+        <path d="M3 4v16m18-7v7M3 16h18M3 9h15a3 3 0 0 1 3 3v4M3 12h6V8H3" />
+      </symbol>
+      <symbol id="i-wifi" viewBox="0 0 24 24">
+        <path
+          d="M2 8a16 16 0 0 1 20 0M5 12a11 11 0 0 1 14 0M8 16a6 6 0 0 1 8 0m-4 4h.01"
+        />
+      </symbol>
+      <symbol id="i-check" viewBox="0 0 24 24">
+        <path d="m5 12 4 4L19 6" />
+      </symbol>
+      <symbol id="i-help" viewBox="0 0 24 24">
+        <path
+          d="M4 14v-3a8 8 0 0 1 16 0v3M5 19H4a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h1Zm14 0h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2h-1Zm0 0c0 3-4 3-7 3"
+        />
+      </symbol>
+      <symbol id="i-info" viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 11v6m0-10h.01" />
+      </symbol>
+      <symbol id="i-file" viewBox="0 0 24 24">
+        <path d="M14 2H5v20h14V7Zm0 0v5h5M8 11h8m-8 4h8m-8 4h5" />
+      </symbol>
+      <symbol id="i-logout" viewBox="0 0 24 24">
+        <path d="M9 3H4v18h5m-1-9h13m-5-5 5 5-5 5" />
+      </symbol>
+      <symbol id="i-phone" viewBox="0 0 24 24">
+        <path d="m5 3 4 4-2 3a15 15 0 0 0 7 7l3-2 4 4-2 3C10 22 2 14 2 5Z" />
+      </symbol>
+      <symbol id="i-pause" viewBox="0 0 24 24">
+        <path d="M9 5v14m6-14v14" />
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24">
+        <path d="m8 5 11 7-11 7Z" />
+      </symbol>
+    </svg>
+    <header class="admin-top">
+      <div class="admin-ident">
+        <span class="mark">M</span>
+        <div><strong>MAPO</strong><small>INMOBILIARIA</small></div>
+      </div>
+      <div class="admin-account">
+        <a href="./?vista=portal#/inicio" target="_blank" rel="noopener"
+          >Ver portal</a
+        ><a href="./?vista=perfil#/perfil">Mi perfil</a
+        ><button id="salir" hidden>Cerrar sesión</button>
+      </div>
+    </header>
+    <main>
+      <p class="tag">CENTRO DE OPERACIONES</p>
+      <h1 id="titulo">Panel de MAPO</h1>
+      <p id="estado" role="status" aria-live="polite">Preparando el acceso…</p>
+      <section id="auth" hidden="">
+        <h2>Ingresar o crear una cuenta</h2>
+        <form id="acceso">
+          <label
+            >Nombre para el registro<input
+              name="nombre"
+              autocomplete="name"
+              maxlength="150" /></label
+          ><label
+            >Correo<input
+              name="correo"
+              type="email"
+              autocomplete="email"
+              required /></label
+          ><label
+            >Contraseña<input
+              type="password"
+              name="clave"
+              autocomplete="current-password"
+          /></label>
+          <div class="acciones">
+            <button value="ingresar">Iniciar sesión</button
+            ><button value="registrar" class="sec">Crear cuenta</button
+            ><button value="recuperar" class="sec">Recuperar acceso</button>
+          </div>
+        </form>
+      </section>
+      <section id="recuperar" hidden>
+        <h2>Cambiar contraseña</h2>
+        <form id="nuevaClave">
+          <label
+            >Nueva contraseña<input
+              type="password"
+              name="clave"
+              minlength="10"
+              autocomplete="new-password"
+              required /></label
+          ><button>Guardar nueva contraseña</button>
+        </form>
+      </section>
+      <section id="cliente" hidden>
+        <h2>Buscar una estancia</h2>
+        <p>
+          El destino es Huancayo. Una solicitud no bloquea las fechas hasta que
+          MAPO la confirma.
+        </p>
+        <form id="buscar">
+          <label
+            >Modalidad<select name="modo">
+              <option value="dias">Por días</option>
+              <option value="mensual">Mensual</option>
+            </select></label
+          ><label>Entrada<input name="entrada" type="date" required /></label
+          ><label id="lbSalida"
+            >Salida<input name="salida" type="date" required /></label
+          ><label id="lbMeses" hidden
+            >Duración<select name="meses">
+              <option>1</option>
+              <option>3</option>
+              <option>6</option>
+              <option>12</option>
+            </select></label
+          ><label
+            >Huéspedes<input
+              name="personas"
+              type="number"
+              min="1"
+              max="100"
+              value="1"
+              required /></label
+          ><button>Buscar disponibles</button>
+        </form>
+        <div id="resultados"></div>
+        <details>
+          <summary>Mis solicitudes y reservas</summary>
+          <div id="mias"></div>
+        </details>
+        <details>
+          <summary>Mis favoritos</summary>
+          <div id="misFav"></div>
+        </details>
+      </section>
+      <section id="admin" hidden>
+        <nav id="admin-nav" aria-label="Secciones de administración">
+          <span>MI ESPACIO</span
+          ><button data-tab="panorama" type="button">Resumen</button
+          ><button data-tab="inventario" type="button">Departamentos</button
+          ><button data-tab="fotos" type="button">Fotos de departamentos</button
+          ><button data-tab="lugar" type="button">Galería del edificio</button
+          ><button data-tab="contenido" type="button">
+            Contenido del portal</button
+          ><button data-tab="reservas" type="button">Reservas</button
+          ><button data-tab="externas" type="button">Canales y bloqueos</button
+          ><button data-tab="caja" type="button">Cobros y cuotas</button
+          ><button data-tab="gastos" type="button">Gastos y garantías</button
+          ><button data-tab="equipo" type="button">Usuarios y roles</button>
+        </nav>
+        <details open="" data-panel="panorama" id="seccion-panorama">
+          <summary>Actividad del edificio</summary>
+          <div class="overview-head">
+            <div>
+              <small>ADMINISTRACIÓN · HUANCAYO</small>
+              <h2>Panorama del edificio</h2>
+              <p>Disponibilidad, reservas y caja del Edificio Marcelo.</p>
+            </div>
+            <span class="live-date" id="panel-date"></span>
+          </div>
+          <form id="informe">
+            <label
+              >Fecha del calendario<input
+                name="dia"
+                type="date"
+                required /></label
+            ><label
+              >Año del informe<input
+                name="anio"
+                type="number"
+                min="2000"
+                max="2200"
+                required /></label
+            ><button>Actualizar panel</button>
+          </form>
+          <div class="month-choice">
+            <label>Mes del tablero<select id="mes-panel"></select></label
+            ><small>Los saldos pendientes se agrupan por vencimiento.</small>
+          </div>
+          <div id="kpis" class="kpi-grid"></div>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <div class="chart-head">
+                <div>
+                  <small>TENDENCIA ANUAL</small>
+                  <h3 id="chart-title">Ocupación por mes</h3>
+                </div>
+                <select id="serie-panel" aria-label="Indicador del gráfico">
+                  <option value="ocupacion_pct">Ocupación</option>
+                  <option value="resultado_caja">Resultado de caja</option>
+                  <option value="cobros">Cobros</option>
+                </select>
+              </div>
+              <div id="grafico-meses" class="bars"></div>
+              <p id="chart-note" class="chart-note"></p>
+            </article>
+            <article class="chart-card">
+              <small>SEGUIMIENTO</small>
+              <h3>Estado de los pagos</h3>
+              <div id="pagos-resumen"></div>
+            </article>
+          </div>
+          <div class="chart-grid">
+            <article class="chart-card">
+              <small>ORIGEN DEL DINERO</small>
+              <h3>Cobros por canal</h3>
+              <div id="canales"></div>
+            </article>
+            <article class="chart-card">
+              <small>OPERACIÓN</small>
+              <h3>Reservas del mes</h3>
+              <div id="actividad-mes"></div>
+            </article>
+          </div>
+          <h3>Departamentos en la fecha elegida</h3>
+          <div id="ocupacion"></div>
+          <h3>Resultados mensuales en soles</h3>
+          <p>
+            Ocupación según noches vendidas; caja = cobros − devoluciones −
+            gastos. Garantías aparte. El pendiente es el saldo actual agrupado
+            por mes de vencimiento.
+          </p>
+          <div id="ranking"></div>
+          <div id="meses"></div>
+        </details>
+        <details data-panel="lugar" id="seccion-lugar" open>
+          <summary>Galería del edificio</summary>
+          <div class="content-heading">
+            <div>
+              <span class="editor-kicker">UN RECORRIDO POR MAPO</span>
+              <h2>El lugar de su próxima historia.</h2>
+              <p>
+                Estas fotos aparecen en Inicio y en Conoce el edificio. Publica
+                los ambientes que quieres presentar.
+              </p>
+            </div>
+            <button type="button" class="sec" id="refrescar-lugar">
+              Actualizar
+            </button>
+          </div>
+          <div id="lugar-metricas" class="editor-metrics"></div>
+          <div class="editor-layout">
+            <section class="upload-panel">
+              <h3 id="editor-foto-titulo">Añadir una fotografía</h3>
+              <form id="foto-lugar-form">
+                <div id="place-file-field" class="ancho">
+                  <label class="drop-photo" id="place-drop"
+                    ><input
+                      name="archivo"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                    /><span class="drop-icon">＋</span
+                    ><strong>Elige o arrastra una fotografía</strong
+                    ><small>JPG, PNG o WebP · hasta 10 MiB</small></label
+                  >
+                </div>
+                <img
+                  id="place-upload-preview"
+                  alt="Vista previa de la fotografía seleccionada"
+                  hidden
+                />
+                <label class="ancho"
+                  >Título<input
+                    name="titulo"
+                    maxlength="100"
+                    placeholder="Una bienvenida a casa"
+                    required
+                /></label>
+                <label class="ancho"
+                  >Descripción<textarea
+                    name="descripcion"
+                    maxlength="500"
+                    rows="3"
+                    placeholder="Describe el ambiente y lo que se ve en la foto."
+                  ></textarea>
+                </label>
+                <label
+                  >Categoría<select name="categoria">
+                    <option value="edificio">El edificio</option>
+                    <option value="ambientes">Sus ambientes</option>
+                    <option value="entorno">El entorno</option>
+                  </select></label
+                >
+                <label
+                  >Orden<input
+                    name="orden"
+                    type="number"
+                    min="0"
+                    max="9999"
+                    value="0"
+                    required
+                /></label>
+                <label class="check-editor ancho"
+                  ><input type="checkbox" name="publicado" /><span
+                    >Publicar en el portal</span
+                  ></label
+                >
+                <p class="editor-hint ancho">
+                  El orden menor aparece primero. Puedes guardar una foto como
+                  borrador y publicarla después.
+                </p>
+                <div class="editor-actions ancho">
+                  <button type="submit" id="guardar-foto-lugar">
+                    Guardar fotografía</button
+                  ><button
+                    type="button"
+                    class="sec"
+                    id="cancelar-foto-lugar"
+                    hidden
+                  >
+                    Cancelar edición
+                  </button>
+                </div>
+                <p
+                  class="editor-feedback ancho"
+                  id="lugar-estado"
+                  role="status"
+                  aria-live="polite"
+                ></p>
+              </form>
+            </section>
+            <section class="gallery-manager">
+              <div class="manager-toolbar">
+                <h3>Tu galería</h3>
+                <label
+                  >Mostrar<select id="filtro-lugar">
+                    <option value="todos">Todas las fotos</option>
+                    <option value="publicadas">Publicadas</option>
+                    <option value="borradores">Borradores</option>
+                  </select></label
+                >
+              </div>
+              <div id="lugar-lista" class="admin-photo-grid"></div>
+            </section>
+          </div>
+        </details>
+        <details data-panel="contenido" id="seccion-contenido" open>
+          <summary>Contenido del portal</summary>
+          <div class="content-heading">
+            <div>
+              <span class="editor-kicker">LA VOZ DE MAPO</span>
+              <h2>Haz que el portal hable por ti.</h2>
+              <p>
+                Actualiza los textos, los canales de atención y la información
+                para los huéspedes.
+              </p>
+            </div>
+            <a
+              class="editor-preview-link"
+              href="./?vista=portal#/inicio"
+              target="_blank"
+              rel="noopener"
+              >Ver portal</a
+            >
+          </div>
+          <form id="contenido-form">
+            <fieldset class="ancho">
+              <legend>La galería de Inicio</legend>
+              <label
+                >Título de la sección<input
+                  name="galeria_titulo"
+                  maxlength="100"
+                  required /></label
+              ><label
+                >Texto de bienvenida<textarea
+                  name="galeria_texto"
+                  maxlength="500"
+                  rows="3"
+                  required
+                ></textarea>
+              </label>
+            </fieldset>
+            <fieldset class="ancho">
+              <legend>Sobre MAPO</legend>
+              <label
+                >Presentación del Edificio Marcelo<textarea
+                  name="sobre_texto"
+                  maxlength="1800"
+                  rows="5"
+                  required
+                ></textarea>
+              </label>
+            </fieldset>
+            <fieldset class="ancho">
+              <legend>Ayuda y contacto</legend>
+              <div class="settings-fields">
+                <label
+                  >WhatsApp (código de país y número)<input
+                    name="whatsapp"
+                    inputmode="tel"
+                    pattern="[1-9][0-9]{7,14}"
+                    placeholder="51912345678"
+                  /><small
+                    >Solo dígitos. Vacío para ocultar el botón.</small
+                  ></label
+                ><label
+                  >Teléfono de atención<input
+                    name="telefono"
+                    type="tel"
+                    pattern="\+[1-9][0-9]{7,14}"
+                    placeholder="+51912345678"
+                  /><small>Incluye + y código de país.</small></label
+                ><label
+                  >Correo de consultas<input
+                    name="correo"
+                    type="email"
+                    maxlength="254"
+                    placeholder="contacto@tuempresa.com" /></label
+                ><label
+                  >Horario o nota de atención<input
+                    name="horario"
+                    maxlength="200"
+                    required /></label
+                ><label class="ancho"
+                  >Ubicación pública<input
+                    name="ubicacion"
+                    maxlength="300"
+                    required
+                  /><small
+                    >Se utiliza para abrir el mapa. Revisa que corresponda al
+                    Edificio Marcelo.</small
+                  ></label
+                >
+              </div>
+            </fieldset>
+            <fieldset class="ancho">
+              <legend>Condiciones de la estancia</legend>
+              <p>
+                Escribe las condiciones vigentes de MAPO que quieras informar
+                antes de una reserva.
+              </p>
+              <label
+                >Disponibilidad<textarea
+                  name="condiciones_disponibilidad"
+                  maxlength="2000"
+                  rows="4"
+                  required
+                ></textarea></label
+              ><label
+                >Tarifas y pagos<textarea
+                  name="condiciones_pagos"
+                  maxlength="2000"
+                  rows="4"
+                  required
+                ></textarea></label
+              ><label
+                >Ingreso y salida<textarea
+                  name="condiciones_llegada"
+                  maxlength="2000"
+                  rows="4"
+                  required
+                ></textarea></label
+              ><label
+                >Cambios y cancelación<textarea
+                  name="condiciones_cambios"
+                  maxlength="2000"
+                  rows="4"
+                  required
+                ></textarea>
+              </label>
+            </fieldset>
+            <div class="settings-save ancho">
+              <div>
+                <strong id="contenido-dirty">Contenido del portal</strong
+                ><small id="contenido-fecha"></small>
+              </div>
+              <button type="submit" id="guardar-contenido">
+                Guardar cambios
+              </button>
+            </div>
+            <p
+              class="editor-feedback ancho"
+              id="contenido-estado"
+              role="status"
+              aria-live="polite"
+            ></p>
+          </form>
+        </details>
+        <details data-panel="inventario" id="seccion-inventario" open="">
+          <summary>Departamentos y servicios</summary>
+          <form id="ficha">
+            <label>Ficha<select name="id" id="editarDep"></select></label
+            ><label
+              >Edificio<select
+                name="edificio"
+                data-lista="edificios"
+                required
+              ></select></label
+            ><label
+              >Código único<input
+                name="codigo"
+                pattern="[a-z0-9][a-z0-9\-]{0,59}"
+                placeholder="gris"
+                required /></label
+            ><label
+              >Nombre<input name="nombre" maxlength="160" required /></label
+            ><label
+              >Capacidad<input
+                name="capacidad"
+                type="number"
+                min="1"
+                max="100" /></label
+            ><label
+              >Dormitorios<input
+                name="dormitorios"
+                type="number"
+                min="0" /></label
+            ><label
+              >Por noche (S/)<input
+                name="dia"
+                type="number"
+                min=".01"
+                step=".01" /></label
+            ><label
+              >Por mes (S/)<input
+                name="mes"
+                type="number"
+                min=".01"
+                step=".01" /></label
+            ><label>Alta en inventario<input name="alta" type="date" /></label
+            ><label
+              >Baja (primer día fuera)<input name="baja" type="date" /></label
+            ><label class="ancho"
+              >Descripción<textarea
+                name="descripcion"
+                maxlength="3500"
+              ></textarea></label
+            ><label
+              ><span>Visible en catálogo</span
+              ><input name="publicado" type="checkbox" /></label
+            ><button>Guardar ficha</button>
+          </form>
+          <div class="inventory-action">
+            <button class="sec" id="eliminar-ficha" type="button">
+              Eliminar ficha sin historial</button
+            ><small
+              >Para una unidad con reservas, usa Baja en inventario.</small
+            >
+          </div>
+          <form id="nuevoServicio">
+            <label>Nuevo servicio<input name="nombre" required /></label
+            ><button>Crear servicio</button>
+          </form>
+          <form id="asignarServicio">
+            <label
+              >Departamento<select
+                name="dep"
+                data-lista="departamentos"
+                required
+              ></select></label
+            ><label
+              >Servicio<select
+                name="serv"
+                data-lista="servicios"
+                required
+              ></select></label
+            ><button value="poner">Asignar servicio</button
+            ><button value="quitar" class="sec">Quitar servicio</button>
+          </form>
+        </details>
+        <details data-panel="fotos" id="seccion-fotos" open="">
+          <summary>Galería de departamentos</summary>
+          <p>
+            JPG, PNG o WebP, hasta 5 MiB. La primera por orden será la portada.
+          </p>
+          <form id="subir">
+            <label
+              >Departamento<select
+                name="dep"
+                data-lista="departamentos"
+                required
+              ></select></label
+            ><label
+              >Imagen<input
+                type="file"
+                name="foto"
+                accept="image/jpeg,image/png,image/webp"
+                required /></label
+            ><label>Descripción de la foto<input name="alt" required /></label
+            ><label
+              >Orden<input
+                type="number"
+                name="orden"
+                min="0"
+                value="0"
+                required /></label
+            ><button>Subir foto</button>
+          </form>
+          <div id="fotosLista"></div>
+        </details>
+        <details data-panel="reservas" id="seccion-reservas" open="">
+          <summary>Solicitudes y estancias</summary>
+          <p>
+            La salida es el primer día libre. Dos estancias pueden coincidir en
+            el día de salida y entrada.
+          </p>
+          <label class="filter-money"
+            >Ver estancias<select id="filtro-reservas">
+              <option value="">Todos los estados</option>
+              <option>solicitada</option>
+              <option>confirmada</option>
+              <option>en_curso</option>
+              <option>finalizada</option>
+              <option>cancelada</option>
+              <option>bloqueada</option>
+            </select></label
+          ><input
+            class="admin-search"
+            id="buscar-reservas"
+            type="search"
+            aria-label="Buscar reservas"
+            placeholder="Buscar por departamento, contacto, fecha o canal"
+          />
+          <div id="reservasLista"></div>
+        </details>
+        <details data-panel="externas" id="seccion-externas" open="">
+          <summary>Reservas externas y bloqueos</summary>
+          <form id="externo">
+            <label
+              >Nombre de cliente externo<input name="nombre" required /></label
+            ><label>Correo<input type="email" name="correo" /></label
+            ><label>Teléfono<input name="tel" /></label
+            ><button>Crear cliente externo</button>
+          </form>
+          <form id="resExterna">
+            <label
+              >Cliente<select
+                name="cli"
+                data-lista="clientes"
+                required
+              ></select></label
+            ><label
+              >Departamento<select
+                name="dep"
+                data-lista="departamentos"
+                required
+              ></select></label
+            ><label
+              >Modalidad<select name="modo">
+                <option value="dias">Por días</option>
+                <option value="mensual">Mensual</option>
+              </select></label
+            ><label>Entrada<input name="ini" type="date" required /></label
+            ><label>Salida (por días)<input name="fin" type="date" /></label
+            ><label
+              >Meses (mensual)<input
+                name="meses"
+                type="number"
+                min="1"
+                max="60" /></label
+            ><label
+              >Huéspedes<input
+                name="hues"
+                type="number"
+                min="1"
+                value="1"
+                required /></label
+            ><label
+              >Canal<select name="canal">
+                <option>airbnb</option>
+                <option>whatsapp</option>
+                <option>directo</option>
+                <option>facebook</option>
+                <option>marketplace</option>
+                <option>otro</option>
+              </select></label
+            ><label>Referencia del canal<input name="ref" /></label
+            ><label
+              >Tarifa acordada por noche o mes (opcional)<input
+                type="number"
+                name="precio"
+                min=".01"
+                step=".01" /></label
+            ><button>Registrar y confirmar</button>
+          </form>
+          <form id="bloqueo">
+            <label
+              >Departamento<select
+                name="dep"
+                data-lista="departamentos"
+                required
+              ></select></label
+            ><label>Desde<input name="ini" type="date" required /></label
+            ><label
+              >Hasta (exclusivo)<input name="fin" type="date" required /></label
+            ><label
+              >Tipo<select name="tipo">
+                <option>mantenimiento</option>
+                <option>uso_propietario</option>
+              </select></label
+            ><label>Motivo<input name="motivo" required /></label
+            ><button>Bloquear fechas</button>
+          </form>
+        </details>
+        <details data-panel="caja" id="seccion-caja" open="">
+          <summary>Cuotas y cobros</summary>
+          <label class="filter-money"
+            >Ver cuotas<select id="filtro-cuotas">
+              <option value="">Todos los estados</option>
+              <option>pendiente</option>
+              <option>parcial</option>
+              <option>pagada</option>
+              <option>anulada</option>
+              <option>vencida</option>
+            </select></label
+          ><input
+            class="admin-search"
+            id="buscar-cuotas"
+            type="search"
+            aria-label="Buscar cuotas"
+            placeholder="Buscar por reserva, cuota o vencimiento"
+          />
+          <div id="cuotasLista"></div>
+          <h3>Pagos y devoluciones registrados</h3>
+          <div id="movLista"></div>
+          <form id="pago">
+            <label
+              >Cuota<select
+                name="cuota"
+                data-lista="cuotas"
+                required
+              ></select></label
+            ><label
+              >Movimiento<select name="tipo">
+                <option>cobro</option>
+                <option>devolucion</option>
+              </select></label
+            ><label
+              >Importe (S/)<input
+                name="importe"
+                type="number"
+                min=".01"
+                step=".01"
+                required /></label
+            ><label
+              >Fecha efectiva<input name="fecha" type="date" required /></label
+            ><label
+              >Medio<select name="medio">
+                <option>yape</option>
+                <option>plin</option>
+                <option>efectivo</option>
+                <option>transferencia</option>
+                <option>tarjeta</option>
+                <option>airbnb</option>
+                <option>otro</option>
+              </select></label
+            ><label>Referencia<input name="ref" /></label
+            ><button>Registrar movimiento</button>
+          </form>
+          <form id="cargo">
+            <label
+              >Reserva<select
+                name="res"
+                data-lista="reservas"
+                required
+              ></select></label
+            ><label
+              >Concepto<select name="concepto">
+                <option>adicional</option>
+                <option>penalidad</option>
+              </select></label
+            ><label>Detalle<input name="detalle" required /></label
+            ><label
+              >Vencimiento<input type="date" name="vence" required /></label
+            ><label
+              >Importe<input
+                type="number"
+                min=".01"
+                step=".01"
+                name="importe"
+                required /></label
+            ><button>Agregar cargo</button>
+          </form>
+        </details>
+        <details data-panel="gastos" id="seccion-gastos" open="">
+          <summary>Gastos y garantías</summary>
+          <form id="gasto">
+            <label
+              >Departamento<select
+                name="dep"
+                data-lista="depOpcional"
+              ></select></label
+            ><label
+              >Fecha del gasto<input name="fecha" type="date" required /></label
+            ><label
+              >Categoría<select name="categoria">
+                <option>limpieza</option>
+                <option>mantenimiento</option>
+                <option>servicios</option>
+                <option>comision</option>
+                <option>otros</option>
+              </select></label
+            ><label>Detalle<input name="detalle" required /></label
+            ><label
+              >Importe (S/)<input
+                name="importe"
+                type="number"
+                min=".01"
+                step=".01"
+                required /></label
+            ><button>Registrar gasto</button>
+          </form>
+          <div id="gastosLista"></div>
+          <form id="garantia">
+            <label
+              >Reserva<select
+                name="res"
+                data-lista="reservas"
+                required
+              ></select></label
+            ><label
+              >Tipo<select name="tipo">
+                <option>recibida</option>
+                <option>devuelta</option>
+              </select></label
+            ><label>Fecha<input name="fecha" type="date" required /></label
+            ><label
+              >Importe (S/)<input
+                name="importe"
+                type="number"
+                min=".01"
+                step=".01"
+                required /></label
+            ><label>Referencia<input name="ref" /></label
+            ><button>Guardar garantía</button>
+          </form>
+          <div id="garantiasLista"></div>
+        </details>
+        <details data-panel="equipo" id="seccion-equipo" open>
+          <summary>Usuarios y permisos</summary>
+          <p>
+            Solo un gestor habilitado por el propietario puede asignar o retirar
+            permisos a otras cuentas confirmadas.
+          </p>
+          <label
+            >Buscar usuario<input
+              id="buscar-equipo"
+              placeholder="Nombre o correo"
+          /></label>
+          <div id="equipo-lista"></div>
+        </details>
+      </section>
+    </main>
+    <footer>MAPO Inmobiliaria · Edificio Marcelo · Huancayo</footer>
+  </body>
+</html>
